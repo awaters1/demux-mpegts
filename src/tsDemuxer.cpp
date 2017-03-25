@@ -749,6 +749,10 @@ int AVContext::parse_ts_psi()
       // clear old pes
       clear_pes(this->packet->channel);
 
+      // Parse PCR PID
+      this->pcr_pid = (size_t)(av_rb16(psi + 5) & 0x0fff);
+      DBG(DEMUX_DBG_DEBUG, "%s: PCR PID %.4x\n", __FUNCTION__, this->pcr_pid);
+
       // parse new version of PMT
       psi += 7;
 
