@@ -203,6 +203,8 @@ void ElementaryStream::Parse(STREAM_PKT* pkt)
     else
       pkt->duration       = c_dts - p_dts;
     pkt->streamChange     = false;
+    DBG(DEMUX_DBG_DEBUG, "PTS: %u DTS: %u PCR: %u PTS-PCR: %u",
+        __FUNCTION__, c_pts, c_dts, c_pcr, pts_pcr_diff);
   }
 }
 

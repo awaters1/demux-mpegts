@@ -77,7 +77,7 @@ namespace TSDemux
 
   struct STREAM_PKT
   {
-    uint16_t              pid;
+    uint32_t              pid;
     size_t                size;
     const unsigned char*  data;
     uint64_t              dts;
@@ -103,6 +103,11 @@ namespace TSDemux
     uint64_t c_pts;               ///< current MPEG stream PTS (presentation time for audio and video)
     uint64_t p_dts;               ///< previous MPEG stream DTS (decode time for video)
     uint64_t p_pts;               ///< previous MPEG stream PTS (presentation time for audio and video)
+
+    uint64_t c_pcr;
+    uint64_t p_pcr;
+
+    int64_t pts_pcr_diff;
 
     bool has_stream_info;         ///< true if stream info is completed else it requires parsing of iframe
 

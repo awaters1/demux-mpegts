@@ -439,6 +439,14 @@ int AVContext::ProcessTSPacket()
     {
       is_discontinuity = (av_rb8(this->av_buf + 5) & 0x80) != 0;
     }
+    bool has_pcr = (av_rb8(this->av_buf + 5) & 0x10) != 0;
+    if (has_pcr && pid == pcr_pid) {
+      uint64_t pcr_base = (av_rb32(this->av_buf + 6) << 1) +
+          (av_rb8(this->av_buf + 10) >> 7);
+      uint64_t pcr_extension = av_rb16(this->av_buf + 10) & 0x1f;
+      pcr = pcr_base * 300 + pcr_extension;
+      DBG(DEMUX_DBG_WARN, "PCR %u\n", this->pcr);
+    }
   }
   if (has_payload)
   {
@@ -989,6 +997,10 @@ int AVContext::parse_ts_pes()
     this->packet->packet_table.len = 6;
   }
 
+
+  this->packet->stream->c_pcr = pcr;
+  this->packet->stream->p_pcr = this->packet->stream->c_pcr;
+
   // Position in the payload buffer. Start at 0
   size_t pos = 0;
 
@@ -1085,6 +1097,10 @@ int AVContext::parse_ts_pes()
     size_t len = this->payload_len - pos;
     this->packet->stream->Append(data, len, has_pts);
   }
+
+  // Calculate offset from PCR
+  uint64_t pcr_90hz = this->packet->stream->c_pcr / 300ULL;
+  this->packet->stream->pts_pcr_diff = this->packet->stream->c_pts - pcr_90hz;
 
   return AVCONTEXT_CONTINUE;
 }

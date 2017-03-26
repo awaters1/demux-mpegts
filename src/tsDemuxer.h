@@ -127,6 +127,7 @@ namespace TSDemux
     const unsigned char* payload;
     size_t payload_len;
     size_t pcr_pid;
+    uint64_t pcr;
     Packet* packet;
   };
 }
